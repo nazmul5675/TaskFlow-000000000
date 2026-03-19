@@ -43,12 +43,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 3500);
     }
 
-    /* ── Delete confirmation ─────────────────────────
-       Any link with data-confirm will prompt the user.
+    /* ── Delete confirmation (Link-based) ───────────
+       Legacy: Any link with data-confirm will prompt.
     ─────────────────────────────────────────────────── */
     document.querySelectorAll('[data-confirm]').forEach(function (el) {
         el.addEventListener('click', function (e) {
             if (!confirm(el.getAttribute('data-confirm'))) {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    /* ── Delete confirmation (Form-based) ───────────
+       Intercepts submission of .delete-form
+    ─────────────────────────────────────────────────── */
+    document.querySelectorAll('.delete-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            if (!confirm('Are you sure you want to delete this task? This cannot be undone.')) {
                 e.preventDefault();
             }
         });

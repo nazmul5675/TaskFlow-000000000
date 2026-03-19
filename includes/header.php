@@ -39,7 +39,7 @@
         }
     </script>
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/TaskFlow/assets/style.css">
+    <!-- Custom CSS (relative path — works on any hosting subfolder) -->
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">

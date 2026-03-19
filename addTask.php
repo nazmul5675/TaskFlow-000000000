@@ -10,59 +10,67 @@ $due_date    = "";
 $message     = "";
 $messageType = "";
 
+$allowedPriorities = ["Low", "Medium", "High"];
+$allowedStatuses   = ["Pending", "Completed"];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $title       = trim($_POST['title']);
-    $description = trim($_POST['description']);
-    $priority    = trim($_POST['priority']);
-    $status      = trim($_POST['status']);
-    $due_date    = trim($_POST['due_date']);
-    $user_id     = $_SESSION['user_id'];
 
-    $allowedPriorities = ["Low", "Medium", "High"];
-    $allowedStatuses   = ["Pending", "Completed"];
-
-    if ($title == "") {
-        $message = "Task title is required.";
-        $messageType = "error";
-    } elseif (strlen($title) < 3) {
-        $message = "Task title must be at least 3 characters.";
-        $messageType = "error";
-    } elseif (strlen($title) > 255) {
-        $message = "Task title must be under 255 characters.";
-        $messageType = "error";
-    } elseif (strlen($description) > 1000) {
-        $message = "Description must be under 1000 characters.";
-        $messageType = "error";
-    } elseif (!in_array($priority, $allowedPriorities)) {
-        $message = "Invalid priority selected.";
-        $messageType = "error";
-    } elseif (!in_array($status, $allowedStatuses)) {
-        $message = "Invalid status selected.";
-        $messageType = "error";
-    } elseif ($due_date != "" && !preg_match("/^\d{4}-\d{2}-\d{2}$/", $due_date)) {
-        $message = "Enter a valid due date.";
-        $messageType = "error";
-    } elseif ($due_date != "" && $status != "Completed" && $due_date < date("Y-m-d")) {
-        $message = "Due date cannot be in the past for a pending task.";
+    /* ── CSRF check ── */
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $message     = "Invalid request. Please try again.";
         $messageType = "error";
     } else {
-        if ($due_date == "") {
-            $due_date = null;
-        }
 
-        $stmt = mysqli_prepare($conn, "INSERT INTO tasks (user_id, title, description, priority, status, due_date) VALUES (?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, "isssss", $user_id, $title, $description, $priority, $status, $due_date);
+        $title       = trim($_POST['title']);
+        $description = trim($_POST['description']);
+        $priority    = trim($_POST['priority']);
+        $status      = trim($_POST['status']);
+        $due_date    = trim($_POST['due_date']);
+        $user_id     = $_SESSION['user_id'];
 
-        if (mysqli_stmt_execute($stmt)) {
-            $_SESSION['success'] = "Task added successfully.";
-            header("Location: dashboard.php");
-            exit;
-        } else {
-            $message = "Something went wrong while adding the task.";
+        if ($title == "") {
+            $message = "Task title is required.";
             $messageType = "error";
-        }
+        } elseif (strlen($title) < 3) {
+            $message = "Task title must be at least 3 characters.";
+            $messageType = "error";
+        } elseif (strlen($title) > 255) {
+            $message = "Task title must be under 255 characters.";
+            $messageType = "error";
+        } elseif (strlen($description) > 1000) {
+            $message = "Description must be under 1000 characters.";
+            $messageType = "error";
+        } elseif (!in_array($priority, $allowedPriorities)) {
+            $message = "Invalid priority selected.";
+            $messageType = "error";
+        } elseif (!in_array($status, $allowedStatuses)) {
+            $message = "Invalid status selected.";
+            $messageType = "error";
+        } elseif ($due_date != "" && !preg_match("/^\d{4}-\d{2}-\d{2}$/", $due_date)) {
+            $message = "Enter a valid due date.";
+            $messageType = "error";
+        } elseif ($due_date != "" && $status != "Completed" && $due_date < date("Y-m-d")) {
+            $message = "Due date cannot be in the past for a pending task.";
+            $messageType = "error";
+        } else {
+            if ($due_date == "") {
+                $due_date = null;
+            }
 
-        mysqli_stmt_close($stmt);
+            $stmt = mysqli_prepare($conn, "INSERT INTO tasks (user_id, title, description, priority, status, due_date) VALUES (?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt, "isssss", $user_id, $title, $description, $priority, $status, $due_date);
+
+            if (mysqli_stmt_execute($stmt)) {
+                $_SESSION['success'] = "Task added successfully.";
+                mysqli_stmt_close($stmt);
+                header("Location: dashboard.php");
+                exit;
+            } else {
+                $message     = "Something went wrong while adding the task.";
+                $messageType = "error";
+            }
+            mysqli_stmt_close($stmt);
+        }
     }
 }
 ?>
@@ -71,7 +79,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="min-h-screen py-10 px-4">
     <div class="max-w-2xl mx-auto">
 
-        <!-- Back link -->
         <a href="dashboard.php" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-6">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
@@ -79,10 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             Back to Dashboard
         </a>
 
-        <!-- Card -->
         <div class="tf-card p-7 animate-scale-in">
-
-            <!-- Header -->
             <div class="flex items-center gap-3 mb-7">
                 <span class="stat-icon bg-indigo-50 w-11 h-11 rounded-xl">
                     <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -97,7 +101,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <hr class="tf-divider mt-0 mb-6">
 
-            <!-- Alert -->
             <?php if ($message != ""): ?>
                 <div class="tf-alert <?php echo $messageType; ?> mb-5 animate-slide-down">
                     <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -107,36 +110,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             <?php endif; ?>
 
-            <!-- Form -->
             <form method="POST" class="space-y-5">
+                <?php echo csrf_field(); ?>
 
-                <!-- Title -->
                 <div>
                     <label class="tf-label" for="title">Task title <span class="text-red-400">*</span></label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value="<?php echo htmlspecialchars($title); ?>"
-                        class="tf-input"
-                        placeholder="e.g. Design homepage wireframe"
-                    >
+                    <input type="text" id="title" name="title"
+                           value="<?php echo htmlspecialchars($title); ?>"
+                           class="tf-input" placeholder="e.g. Design homepage wireframe">
                 </div>
 
-                <!-- Description -->
                 <div>
                     <label class="tf-label" for="description">Description <span class="text-slate-400 font-normal normal-case">(optional)</span></label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        rows="4"
-                        class="tf-input resize-y"
-                        placeholder="Add any notes or details about this task…"
-                    ><?php echo htmlspecialchars($description); ?></textarea>
+                    <textarea id="description" name="description" rows="4"
+                              class="tf-input resize-y"
+                              placeholder="Add any notes or details about this task…"><?php echo htmlspecialchars($description); ?></textarea>
                     <p class="text-xs text-slate-400 mt-1">Max 1000 characters</p>
                 </div>
 
-                <!-- Priority / Status / Due Date -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="tf-label" for="priority">Priority</label>
@@ -155,17 +146,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <div>
                         <label class="tf-label" for="due_date">Due date</label>
-                        <input
-                            type="date"
-                            id="due_date"
-                            name="due_date"
-                            value="<?php echo htmlspecialchars($due_date); ?>"
-                            class="tf-input"
-                        >
+                        <input type="date" id="due_date" name="due_date"
+                               value="<?php echo htmlspecialchars($due_date); ?>"
+                               class="tf-input">
                     </div>
                 </div>
 
-                <!-- Actions -->
                 <div class="flex gap-3 pt-1">
                     <button type="submit" class="btn btn-primary flex-1 justify-center py-2.5">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -173,9 +159,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </svg>
                         Add Task
                     </button>
-                    <a href="dashboard.php" class="btn btn-secondary py-2.5">
-                        Cancel
-                    </a>
+                    <a href="dashboard.php" class="btn btn-secondary py-2.5">Cancel</a>
                 </div>
             </form>
         </div>

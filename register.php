@@ -1,73 +1,77 @@
 <?php
 session_start();
+require_once 'includes/csrf.php';
 include 'config/db.php';
 
-$name = "";
-$email = "";
-$message = "";
+$name        = "";
+$email       = "";
+$message     = "";
 $messageType = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name     = trim($_POST['name']);
-    $email    = trim($_POST['email']);
-    $password = trim($_POST['password']);
 
-    if ($name == "" || $email == "" || $password == "") {
-        $message = "All fields are required.";
-        $messageType = "error";
-    } elseif (strlen($name) < 2) {
-        $message = "Name must be at least 2 characters.";
-        $messageType = "error";
-    } elseif (strlen($name) > 100) {
-        $message = "Name must be under 100 characters.";
-        $messageType = "error";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $message = "Enter a valid email address.";
-        $messageType = "error";
-    } elseif (strlen($email) > 100) {
-        $message = "Email must be under 100 characters.";
-        $messageType = "error";
-    } elseif (strlen($password) < 6) {
-        $message = "Password must be at least 6 characters.";
-        $messageType = "error";
-    } elseif (strlen($password) > 255) {
-        $message = "Password is too long.";
+    /* ── CSRF check ── */
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $message     = "Invalid request. Please try again.";
         $messageType = "error";
     } else {
-        $checkStmt = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ?");
-        mysqli_stmt_bind_param($checkStmt, "s", $email);
-        mysqli_stmt_execute($checkStmt);
-        $checkResult = mysqli_stmt_get_result($checkStmt);
 
-        if (mysqli_num_rows($checkResult) > 0) {
-            $message = "An account with this email already exists.";
+        $name     = trim($_POST['name']);
+        $email    = trim($_POST['email']);
+        $password = trim($_POST['password']);
+
+        if ($name == "" || $email == "" || $password == "") {
+            $message     = "All fields are required.";
+            $messageType = "error";
+        } elseif (strlen($name) < 2) {
+            $message     = "Name must be at least 2 characters.";
+            $messageType = "error";
+        } elseif (strlen($name) > 100) {
+            $message     = "Name must be under 100 characters.";
+            $messageType = "error";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $message     = "Enter a valid email address.";
+            $messageType = "error";
+        } elseif (strlen($email) > 100) {
+            $message     = "Email must be under 100 characters.";
+            $messageType = "error";
+        } elseif (strlen($password) < 6) {
+            $message     = "Password must be at least 6 characters.";
+            $messageType = "error";
+        } elseif (strlen($password) > 255) {
+            $message     = "Password is too long.";
             $messageType = "error";
         } else {
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $checkStmt = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ?");
+            mysqli_stmt_bind_param($checkStmt, "s", $email);
+            mysqli_stmt_execute($checkStmt);
+            $checkResult = mysqli_stmt_get_result($checkStmt);
 
-            $insertStmt = mysqli_prepare($conn, "INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-            mysqli_stmt_bind_param($insertStmt, "sss", $name, $email, $hashedPassword);
-
-            if (mysqli_stmt_execute($insertStmt)) {
-                $_SESSION['success'] = "Account created successfully! You can now log in.";
-                header("Location: register.php");
-                exit;
-            } else {
-                $message = "Something went wrong. Please try again.";
+            if (mysqli_num_rows($checkResult) > 0) {
+                $message     = "An account with this email already exists.";
                 $messageType = "error";
+                mysqli_stmt_close($checkStmt);
+            } else {
+                mysqli_stmt_close($checkStmt);
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+                $insertStmt = mysqli_prepare($conn, "INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+                mysqli_stmt_bind_param($insertStmt, "sss", $name, $email, $hashedPassword);
+
+                if (mysqli_stmt_execute($insertStmt)) {
+                    /* ── PRG: redirect to login with success flash ── */
+                    $_SESSION['success'] = "Account created! You can now sign in.";
+                    mysqli_stmt_close($insertStmt);
+                    header("Location: login.php");
+                    exit;
+                } else {
+                    $message     = "Something went wrong. Please try again.";
+                    $messageType = "error";
+                    mysqli_stmt_close($insertStmt);
+                }
             }
-
-            mysqli_stmt_close($insertStmt);
         }
-
-        mysqli_stmt_close($checkStmt);
     }
-}
-
-if (isset($_SESSION['success'])) {
-    $message = $_SESSION['success'];
-    $messageType = "success";
-    unset($_SESSION['success']);
 }
 ?>
 <?php include 'includes/header.php'; ?>
@@ -87,7 +91,6 @@ if (isset($_SESSION['success'])) {
 
     <!-- Auth Card -->
     <div class="auth-card w-full">
-        <!-- Header -->
         <div class="text-center mb-7">
             <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Create your account</h1>
             <p class="text-slate-500 mt-1.5 text-sm">Start managing your tasks with TaskFlow</p>
@@ -111,54 +114,31 @@ if (isset($_SESSION['success'])) {
 
         <!-- Form -->
         <form method="POST" autocomplete="off" class="space-y-5">
+            <?php echo csrf_field(); ?>
 
-            <!-- Name -->
             <div>
                 <label class="tf-label" for="name">Full name</label>
-                <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value="<?php echo htmlspecialchars($name); ?>"
-                    autocomplete="off"
-                    class="tf-input"
-                    placeholder="Jane Doe"
-                >
+                <input type="text" id="name" name="name"
+                       value="<?php echo htmlspecialchars($name); ?>"
+                       autocomplete="off" class="tf-input" placeholder="Jane Doe">
             </div>
 
-            <!-- Email -->
             <div>
                 <label class="tf-label" for="email">Email address</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value="<?php echo htmlspecialchars($email); ?>"
-                    autocomplete="off"
-                    class="tf-input"
-                    placeholder="you@example.com"
-                >
+                <input type="email" id="email" name="email"
+                       value="<?php echo htmlspecialchars($email); ?>"
+                       autocomplete="off" class="tf-input" placeholder="you@example.com">
             </div>
 
-            <!-- Password -->
             <div>
                 <label class="tf-label" for="password">Password</label>
                 <div class="relative">
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        autocomplete="new-password"
-                        class="tf-input pr-11"
-                        placeholder="Min. 6 characters"
-                    >
-                    <button
-                        type="button"
-                        class="toggle-password"
-                        data-toggle-password
-                        data-target="password"
-                        title="Toggle password visibility"
-                    >
+                    <input type="password" id="password" name="password"
+                           autocomplete="new-password" class="tf-input pr-11"
+                           placeholder="Min. 6 characters">
+                    <button type="button" class="toggle-password"
+                            data-toggle-password data-target="password"
+                            title="Toggle password visibility">
                         <svg class="icon-eye w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                             <circle cx="12" cy="12" r="3"/>
@@ -171,18 +151,12 @@ if (isset($_SESSION['success'])) {
                 </div>
             </div>
 
-            <!-- Submit -->
-            <button type="submit" class="btn btn-primary btn-block mt-1">
-                Create account
-            </button>
+            <button type="submit" class="btn btn-primary btn-block mt-1">Create account</button>
         </form>
 
-        <!-- Cross link -->
         <p class="text-center text-sm text-slate-500 mt-6">
             Already have an account?
-            <a href="login.php" class="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors">
-                Sign in
-            </a>
+            <a href="login.php" class="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors">Sign in</a>
         </p>
     </div>
 </div>

@@ -368,21 +368,29 @@ $result = mysqli_stmt_get_result($stmt);
                             <!-- Right: actions -->
                             <div class="flex flex-row sm:flex-col lg:flex-row gap-2 flex-shrink-0 self-start">
                                 <?php if ($task['status'] == "Pending"): ?>
-                                    <a href="updateStatus.php?id=<?php echo $task['id']; ?>&status=Completed"
-                                       class="btn btn-success text-xs px-3 py-1.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        Done
-                                    </a>
+                                    <form action="updateStatus.php" method="POST" class="inline">
+                                        <?php echo csrf_field(); ?>
+                                        <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
+                                        <input type="hidden" name="status" value="Completed">
+                                        <button type="submit" class="btn btn-success text-xs px-3 py-1.5 w-full">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            Done
+                                        </button>
+                                    </form>
                                 <?php else: ?>
-                                    <a href="updateStatus.php?id=<?php echo $task['id']; ?>&status=Pending"
-                                       class="btn btn-warning text-xs px-3 py-1.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                            <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
-                                        </svg>
-                                        Reopen
-                                    </a>
+                                    <form action="updateStatus.php" method="POST" class="inline">
+                                        <?php echo csrf_field(); ?>
+                                        <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
+                                        <input type="hidden" name="status" value="Pending">
+                                        <button type="submit" class="btn btn-warning text-xs px-3 py-1.5 w-full">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+                                            </svg>
+                                            Reopen
+                                        </button>
+                                    </form>
                                 <?php endif; ?>
 
                                 <a href="editTask.php?id=<?php echo $task['id']; ?>"
@@ -394,14 +402,16 @@ $result = mysqli_stmt_get_result($stmt);
                                     Edit
                                 </a>
 
-                                <a href="deleteTask.php?id=<?php echo $task['id']; ?>"
-                                   class="btn btn-danger text-xs px-3 py-1.5"
-                                   onclick="return confirm('Are you sure you want to delete this task? This cannot be undone.')">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
-                                    </svg>
-                                    Delete
-                                </a>
+                                <form action="deleteTask.php" method="POST" class="inline delete-form">
+                                    <?php echo csrf_field(); ?>
+                                    <input type="hidden" name="id" value="<?php echo $task['id']; ?>">
+                                    <button type="submit" class="btn btn-danger text-xs px-3 py-1.5 w-full">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>

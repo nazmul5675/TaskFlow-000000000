@@ -41,11 +41,6 @@ TaskFlow is a sleek, portfolio-quality PHP & MySQL task management application d
 3. Import `database.sql` into your remote database.
 4. Correct the credentials in `config/.env.php` on the server.
 
-### Railway
-1. Connect your GitHub repository to a new Railway project.
-2. Add a MySQL service to your project.
-3. In the Railway dashboard for your PHP service, add the environment variables listed in `.env.example`.
-4. The application will automatically use these variables via the `getenv()` logic in `config/db.php`.
 
 ## 🔑 Demo Credentials
 - **Email**: `demo@example.com`

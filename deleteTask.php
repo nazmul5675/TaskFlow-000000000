@@ -15,5 +15,6 @@ mysqli_stmt_bind_param($stmt, "ii", $task_id, $user_id);
 mysqli_stmt_execute($stmt);
 mysqli_stmt_close($stmt);
 
+$_SESSION['success'] = "Task deleted successfully.";
 header("Location: dashboard.php");
 exit;

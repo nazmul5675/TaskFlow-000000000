@@ -18,8 +18,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $due_date = trim($_POST['due_date']);
     $user_id = $_SESSION['user_id'];
 
+    $allowedPriorities = ["Low", "Medium", "High"];
+    $allowedStatuses = ["Pending", "Completed"];
+
     if ($title == "") {
         $message = "Task title is required.";
+        $messageType = "error";
+    } elseif (strlen($title) < 3) {
+        $message = "Task title must be at least 3 characters.";
+        $messageType = "error";
+    } elseif (strlen($title) > 255) {
+        $message = "Task title must be under 255 characters.";
+        $messageType = "error";
+    } elseif (strlen($description) > 1000) {
+        $message = "Description must be under 1000 characters.";
+        $messageType = "error";
+    } elseif (!in_array($priority, $allowedPriorities)) {
+        $message = "Invalid priority selected.";
+        $messageType = "error";
+    } elseif (!in_array($status, $allowedStatuses)) {
+        $message = "Invalid status selected.";
+        $messageType = "error";
+    } elseif ($due_date != "" && !preg_match("/^\d{4}-\d{2}-\d{2}$/", $due_date)) {
+        $message = "Enter a valid due date.";
+        $messageType = "error";
+    } elseif ($due_date != "" && $status != "Completed" && $due_date < date("Y-m-d")) {
+        $message = "Due date cannot be in the past for a pending task.";
         $messageType = "error";
     } else {
         if ($due_date == "") {
@@ -119,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <?php if ($message != ""): ?>
             <div class="mt-6 p-4 rounded-lg <?php echo $messageType == 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?>">
-                <?php echo $message; ?>
+                <?php echo htmlspecialchars($message); ?>
             </div>
         <?php endif; ?>
     </div>

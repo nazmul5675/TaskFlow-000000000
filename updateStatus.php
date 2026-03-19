@@ -21,5 +21,6 @@ mysqli_stmt_bind_param($stmt, "sii", $new_status, $task_id, $user_id);
 mysqli_stmt_execute($stmt);
 mysqli_stmt_close($stmt);
 
+$_SESSION['success'] = "Task status updated successfully.";
 header("Location: dashboard.php");
 exit;

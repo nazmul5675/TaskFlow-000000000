@@ -18,7 +18,7 @@ $due_date = "";
 $message = "";
 $messageType = "";
 
-/* Step A: get the current task data */
+/* Load current task */
 $stmt = mysqli_prepare($conn, "SELECT id, title, description, priority, status, due_date FROM tasks WHERE id = ? AND user_id = ?");
 mysqli_stmt_bind_param($stmt, "ii", $task_id, $user_id);
 mysqli_stmt_execute($stmt);
@@ -39,7 +39,7 @@ $priority = $task['priority'];
 $status = $task['status'];
 $due_date = $task['due_date'];
 
-/* Step B: if form submitted, update task */
+/* Update task */
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
@@ -51,10 +51,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $message = "Task title is required.";
         $messageType = "error";
     } else {
+        if ($due_date == "") {
+            $due_date = null;
+        }
+
         $updateStmt = mysqli_prepare($conn, "UPDATE tasks SET title = ?, description = ?, priority = ?, status = ?, due_date = ? WHERE id = ? AND user_id = ?");
         mysqli_stmt_bind_param($updateStmt, "sssssii", $title, $description, $priority, $status, $due_date, $task_id, $user_id);
 
         if (mysqli_stmt_execute($updateStmt)) {
+            $_SESSION['success'] = "Task updated successfully.";
             header("Location: dashboard.php");
             exit;
         } else {

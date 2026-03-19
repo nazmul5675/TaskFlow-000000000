@@ -41,9 +41,3 @@ TaskFlow is a sleek, portfolio-quality PHP & MySQL task management application d
 3. Import `database.sql` into your remote database.
 4. Correct the credentials in `config/.env.php` on the server.
 
-
-## 🔑 Demo Credentials
-- **Email**: `demo@example.com`
-- **Password**: `password123`
-
-

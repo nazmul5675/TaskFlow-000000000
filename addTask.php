@@ -2,24 +2,24 @@
 include 'includes/auth.php';
 include 'config/db.php';
 
-$title = "";
+$title       = "";
 $description = "";
-$priority = "Medium";
-$status = "Pending";
-$due_date = "";
-$message = "";
+$priority    = "Medium";
+$status      = "Pending";
+$due_date    = "";
+$message     = "";
 $messageType = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $title = trim($_POST['title']);
+    $title       = trim($_POST['title']);
     $description = trim($_POST['description']);
-    $priority = trim($_POST['priority']);
-    $status = trim($_POST['status']);
-    $due_date = trim($_POST['due_date']);
-    $user_id = $_SESSION['user_id'];
+    $priority    = trim($_POST['priority']);
+    $status      = trim($_POST['status']);
+    $due_date    = trim($_POST['due_date']);
+    $user_id     = $_SESSION['user_id'];
 
     $allowedPriorities = ["Low", "Medium", "High"];
-    $allowedStatuses = ["Pending", "Completed"];
+    $allowedStatuses   = ["Pending", "Completed"];
 
     if ($title == "") {
         $message = "Task title is required.";
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: dashboard.php");
             exit;
         } else {
-            $message = "Something went wrong while adding task.";
+            $message = "Something went wrong while adding the task.";
             $messageType = "error";
         }
 
@@ -66,86 +66,119 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 <?php include 'includes/header.php'; ?>
 
-<div class="min-h-screen py-10 bg-gray-100">
-    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-blue-600">Add Task</h1>
-                <p class="text-gray-500">Create a new task in TaskFlow</p>
-            </div>
+<div class="min-h-screen py-10 px-4">
+    <div class="max-w-2xl mx-auto">
 
-            <a href="dashboard.php" class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">
-                Back
-            </a>
-        </div>
+        <!-- Back link -->
+        <a href="dashboard.php" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-6">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to Dashboard
+        </a>
 
-        <form method="POST" class="space-y-4">
-            <div>
-                <label class="block mb-1 font-medium">Task Title</label>
-                <input
-                    type="text"
-                    name="title"
-                    value="<?php echo htmlspecialchars($title); ?>"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2"
-                    placeholder="Enter task title"
-                >
-            </div>
+        <!-- Card -->
+        <div class="tf-card p-7 animate-scale-in">
 
-            <div>
-                <label class="block mb-1 font-medium">Description</label>
-                <textarea
-                    name="description"
-                    rows="4"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2"
-                    placeholder="Enter task description"
-                ><?php echo htmlspecialchars($description); ?></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-7">
+                <span class="stat-icon bg-indigo-50 w-11 h-11 rounded-xl">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                </span>
                 <div>
-                    <label class="block mb-1 font-medium">Priority</label>
-                    <select name="priority" class="w-full border border-gray-300 rounded-lg px-4 py-2">
-                        <option value="Low" <?php echo $priority == "Low" ? "selected" : ""; ?>>Low</option>
-                        <option value="Medium" <?php echo $priority == "Medium" ? "selected" : ""; ?>>Medium</option>
-                        <option value="High" <?php echo $priority == "High" ? "selected" : ""; ?>>High</option>
-                    </select>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Add New Task</h1>
+                    <p class="text-slate-500 text-sm mt-0.5">Create a task and keep track of your work</p>
                 </div>
+            </div>
 
-                <div>
-                    <label class="block mb-1 font-medium">Status</label>
-                    <select name="status" class="w-full border border-gray-300 rounded-lg px-4 py-2">
-                        <option value="Pending" <?php echo $status == "Pending" ? "selected" : ""; ?>>Pending</option>
-                        <option value="Completed" <?php echo $status == "Completed" ? "selected" : ""; ?>>Completed</option>
-                    </select>
+            <hr class="tf-divider mt-0 mb-6">
+
+            <!-- Alert -->
+            <?php if ($message != ""): ?>
+                <div class="tf-alert <?php echo $messageType; ?> mb-5 animate-slide-down">
+                    <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <?php echo htmlspecialchars($message); ?>
                 </div>
+            <?php endif; ?>
 
+            <!-- Form -->
+            <form method="POST" class="space-y-5">
+
+                <!-- Title -->
                 <div>
-                    <label class="block mb-1 font-medium">Due Date</label>
+                    <label class="tf-label" for="title">Task title <span class="text-red-400">*</span></label>
                     <input
-                        type="date"
-                        name="due_date"
-                        value="<?php echo htmlspecialchars($due_date); ?>"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2"
+                        type="text"
+                        id="title"
+                        name="title"
+                        value="<?php echo htmlspecialchars($title); ?>"
+                        class="tf-input"
+                        placeholder="e.g. Design homepage wireframe"
                     >
                 </div>
-            </div>
 
-            <button
-                type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-            >
-                Add Task
-            </button>
-        </form>
+                <!-- Description -->
+                <div>
+                    <label class="tf-label" for="description">Description <span class="text-slate-400 font-normal normal-case">(optional)</span></label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="4"
+                        class="tf-input resize-y"
+                        placeholder="Add any notes or details about this task…"
+                    ><?php echo htmlspecialchars($description); ?></textarea>
+                    <p class="text-xs text-slate-400 mt-1">Max 1000 characters</p>
+                </div>
 
-        <?php if ($message != ""): ?>
-            <div class="mt-6 p-4 rounded-lg <?php echo $messageType == 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?>">
-                <?php echo htmlspecialchars($message); ?>
-            </div>
-        <?php endif; ?>
+                <!-- Priority / Status / Due Date -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="tf-label" for="priority">Priority</label>
+                        <select id="priority" name="priority" class="tf-input">
+                            <option value="Low"    <?php echo $priority == "Low"    ? "selected" : ""; ?>>🔵 Low</option>
+                            <option value="Medium" <?php echo $priority == "Medium" ? "selected" : ""; ?>>🟡 Medium</option>
+                            <option value="High"   <?php echo $priority == "High"   ? "selected" : ""; ?>>🔴 High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="tf-label" for="status">Status</label>
+                        <select id="status" name="status" class="tf-input">
+                            <option value="Pending"   <?php echo $status == "Pending"   ? "selected" : ""; ?>>⏳ Pending</option>
+                            <option value="Completed" <?php echo $status == "Completed" ? "selected" : ""; ?>>✅ Completed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="tf-label" for="due_date">Due date</label>
+                        <input
+                            type="date"
+                            id="due_date"
+                            name="due_date"
+                            value="<?php echo htmlspecialchars($due_date); ?>"
+                            class="tf-input"
+                        >
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3 pt-1">
+                    <button type="submit" class="btn btn-primary flex-1 justify-center py-2.5">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Add Task
+                    </button>
+                    <a href="dashboard.php" class="btn btn-secondary py-2.5">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

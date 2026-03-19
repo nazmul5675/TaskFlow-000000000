@@ -1,0 +1,378 @@
+/* ===================================================
+   TaskFlow — Custom CSS Design System
+   =================================================== */
+
+/* ── Keyframe animations ─────────────────────────── */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0);     }
+}
+
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1);    }
+}
+
+/* ── Utility animation classes ───────────────────── */
+.animate-fade-in      { animation: fadeIn  0.35s ease both; }
+.animate-slide-up     { animation: slideUp 0.40s ease both; }
+.animate-slide-down   { animation: slideDown 0.35s ease both; }
+.animate-scale-in     { animation: scaleIn  0.35s cubic-bezier(.34,1.56,.64,1) both; }
+
+/* Stagger helper for task cards */
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.20s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(n+6) { animation-delay: 0.28s; }
+
+/* ── Design tokens ───────────────────────────────── */
+:root {
+    --color-bg:       #F8FAFC;
+    --color-card:     #FFFFFF;
+    --color-primary:  #4f46e5;  /* indigo-600 */
+    --color-success:  #059669;  /* emerald-600 */
+    --color-warning:  #d97706;  /* amber-600 */
+    --color-danger:   #dc2626;  /* red-600 */
+    --color-text:     #1e293b;  /* slate-800 */
+    --color-muted:    #64748b;  /* slate-500 */
+    --color-border:   #e2e8f0;  /* slate-200 */
+    --radius-card:    1rem;
+    --radius-input:   0.5rem;
+    --shadow-card:    0 1px 3px rgba(0,0,0,.07), 0 1px 2px -1px rgba(0,0,0,.04);
+    --shadow-hover:   0 8px 24px rgba(0,0,0,.10);
+}
+
+/* ── Global resets / typography ──────────────────── */
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Auth card ───────────────────────────────────── */
+.auth-card {
+    background: var(--color-card);
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 60px -12px rgba(79,70,229,0.15), 0 0 0 1px rgba(79,70,229,0.06);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 28rem;
+    animation: scaleIn 0.45s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+/* ── Form elements ───────────────────────────────── */
+.tf-input {
+    display: block;
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-text);
+    background: #fff;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-input);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    outline: none;
+    font-family: inherit;
+}
+.tf-input::placeholder {
+    color: #94a3b8; /* slate-400 */
+}
+.tf-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
+}
+.tf-input:hover:not(:focus) {
+    border-color: #94a3b8;
+}
+
+/* Select inherits tf-input via class */
+select.tf-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2364748b'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.1em;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+.tf-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    margin-bottom: 0.375rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+/* ── Button system ───────────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.575rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+.btn:hover   { transform: translateY(-1px); }
+.btn:active  { transform: translateY(0); }
+
+.btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(79,70,229,0.28);
+}
+.btn-primary:hover { background: #4338ca; box-shadow: 0 4px 14px rgba(79,70,229,0.35); }
+
+.btn-success {
+    background: var(--color-success);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(5,150,105,0.25);
+}
+.btn-success:hover { background: #047857; box-shadow: 0 4px 14px rgba(5,150,105,0.32); }
+
+.btn-warning {
+    background: #f59e0b;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(245,158,11,0.25);
+}
+.btn-warning:hover { background: #d97706; box-shadow: 0 4px 14px rgba(245,158,11,0.32); }
+
+.btn-danger {
+    background: var(--color-danger);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(220,38,38,0.22);
+}
+.btn-danger:hover { background: #b91c1c; box-shadow: 0 4px 14px rgba(220,38,38,0.30); }
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1.5px solid var(--color-border);
+    box-shadow: none;
+}
+.btn-secondary:hover { background: #e2e8f0; color: #1e293b; }
+
+.btn-ghost {
+    background: transparent;
+    color: #64748b;
+    box-shadow: none;
+}
+.btn-ghost:hover { background: #f1f5f9; color: #1e293b; }
+
+/* Full-width variant */
+.btn-block { width: 100%; justify-content: center; padding-top: 0.75rem; padding-bottom: 0.75rem; font-size: 1rem; }
+
+/* ── Card ────────────────────────────────────────── */
+.tf-card {
+    background: var(--color-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(226,232,240,0.7);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.tf-card:hover { box-shadow: var(--shadow-hover); }
+
+/* ── Task Card ─────────────────────────────────── */
+.task-card {
+    background: var(--color-card);
+    border-radius: 0.875rem;
+    border: 1.5px solid var(--color-border);
+    padding: 1.25rem 1.375rem;
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    animation: slideUp 0.3s ease both;
+}
+.task-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    border-color: #c7d2fe;
+    transform: translateY(-2px);
+}
+.task-card.overdue-card {
+    border-left: 4px solid var(--color-danger);
+}
+
+/* ── Badges / Chips ──────────────────────────────── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+.badge-pending   { background: #fef3c7; color: #92400e; }
+.badge-completed { background: #d1fae5; color: #065f46; }
+.badge-low       { background: #dbeafe; color: #1e40af; }
+.badge-medium    { background: #fde68a; color: #92400e; }  /* warm amber */
+.badge-high      { background: #fee2e2; color: #991b1b; }
+.badge-overdue   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.badge-due       { background: #f0f9ff; color: #075985; }
+
+/* ── Summary stat card ───────────────────────────── */
+.stat-card {
+    background: var(--color-card);
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(226,232,240,0.7);
+    box-shadow: var(--shadow-card);
+    padding: 1.375rem 1.5rem;
+    transition: box-shadow 0.2s ease, transform 0.18s ease;
+}
+.stat-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.stat-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ── Flash / Toast ───────────────────────────────── */
+.flash-toast {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    animation: slideDown 0.4s ease both;
+    transition: opacity 0.5s ease;
+}
+.flash-toast.success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+.flash-toast.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+/* ── Alert (inline form errors) ──────────────────── */
+.tf-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.625rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.tf-alert.error { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+.tf-alert.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+
+/* ── Nav / Top bar ───────────────────────────────── */
+.top-nav {
+    background: #fff;
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+/* ── Empty state ─────────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 3.5rem 1rem;
+}
+.empty-icon {
+    width: 5rem;
+    height: 5rem;
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    border-radius: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+}
+
+/* ── Scrollbar (webkit) ──────────────────────────── */
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ── Password toggle ─────────────────────────────── */
+.toggle-password {
+    position: absolute;
+    top: 50%; right: 0.75rem;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    padding: 0.25rem;
+    border-radius: 0.375rem;
+    transition: color 0.15s;
+}
+.toggle-password:hover { color: #475569; }
+
+/* ── Section title ───────────────────────────────── */
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+}
+
+/* ── Divider ─────────────────────────────────────── */
+.tf-divider {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 1.5rem 0;
+}
+
+/* ── Logo mark ───────────────────────────────────── */
+.logo-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    letter-spacing: -0.03em;
+    text-decoration: none;
+}
+.logo-icon {
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}

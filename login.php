@@ -29,8 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $user = mysqli_fetch_assoc($result);
 
             if (password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['user_id']    = $user['id'];
+                $_SESSION['user_name']  = $user['name'];
                 $_SESSION['user_email'] = $user['email'];
 
                 header("Location: dashboard.php");
@@ -48,83 +48,105 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 <?php include 'includes/header.php'; ?>
 
-<div class="min-h-screen flex items-center justify-center py-10">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-        <h1 class="text-2xl font-bold text-blue-600 text-center mb-2">Login</h1>
-        <p class="text-gray-500 text-center mb-6">Sign in to TaskFlow</p>
+<div class="min-h-screen flex flex-col items-center justify-center px-4 py-16">
 
-        <form method="POST" autocomplete="off" class="space-y-4">
+    <!-- Logo -->
+    <a href="login.php" class="logo-mark mb-8 animate-fade-in">
+        <span class="logo-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 11l3 3L22 4"/>
+                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+        </span>
+        TaskFlow
+    </a>
+
+    <!-- Auth Card -->
+    <div class="auth-card w-full">
+        <!-- Header -->
+        <div class="text-center mb-7">
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Welcome back</h1>
+            <p class="text-slate-500 mt-1.5 text-sm">Sign in to your TaskFlow account</p>
+        </div>
+
+        <!-- Alert -->
+        <?php if ($message != ""): ?>
+            <div class="tf-alert <?php echo $messageType; ?> mb-5 animate-slide-down">
+                <?php if ($messageType === 'error'): ?>
+                    <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                <?php endif; ?>
+                <?php echo htmlspecialchars($message); ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Form -->
+        <form method="POST" autocomplete="off" class="space-y-5">
+
+            <!-- Email -->
             <div>
-                <label class="block mb-1 font-medium">Email</label>
+                <label class="tf-label" for="email">Email address</label>
                 <input
                     type="email"
+                    id="email"
                     name="email"
                     value="<?php echo htmlspecialchars($email); ?>"
                     autocomplete="off"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2"
-                    placeholder="Enter your email"
+                    class="tf-input"
+                    placeholder="you@example.com"
                 >
             </div>
 
+            <!-- Password -->
             <div>
-                <label class="block mb-1 font-medium">Password</label>
+                <label class="tf-label" for="password">Password</label>
                 <div class="relative">
                     <input
                         type="password"
-                        name="password"
                         id="password"
+                        name="password"
                         autocomplete="new-password"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-12"
+                        class="tf-input pr-11"
                         placeholder="Enter your password"
                     >
-
                     <button
                         type="button"
-                        id="togglePassword"
-                        class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                        class="toggle-password"
+                        data-toggle-password
+                        data-target="password"
+                        title="Toggle password visibility"
                     >
-                        <span id="eyeOpen">🙉</span>
-                        <span id="eyeClosed" class="hidden">🙈</span>
+                        <!-- Eye open -->
+                        <svg class="icon-eye w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <!-- Eye off -->
+                        <svg class="icon-eye-off w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
                     </button>
                 </div>
             </div>
 
-            <button
-                type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-            >
-                Login
+            <!-- Submit -->
+            <button type="submit" class="btn btn-primary btn-block mt-1">
+                Sign in
             </button>
         </form>
 
-        <?php if ($message != ""): ?>
-            <div class="mt-6 p-4 rounded-lg <?php echo $messageType == 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'; ?>">
-                <?php echo htmlspecialchars($message); ?>
-            </div>
-        <?php endif; ?>
+        <!-- Cross link -->
+        <p class="text-center text-sm text-slate-500 mt-6">
+            Don't have an account?
+            <a href="register.php" class="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors">
+                Create one
+            </a>
+        </p>
     </div>
 </div>
-
-<script>
-    const passwordInput = document.getElementById('password');
-    const togglePassword = document.getElementById('togglePassword');
-    const eyeOpen = document.getElementById('eyeOpen');
-    const eyeClosed = document.getElementById('eyeClosed');
-
-    togglePassword.addEventListener('click', function () {
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            eyeOpen.classList.add('hidden');
-            eyeClosed.classList.remove('hidden');
-        } else {
-            passwordInput.type = 'password';
-            eyeOpen.classList.remove('hidden');
-            eyeClosed.classList.add('hidden');
-        }
-    });
-</script>
 
 <?php include 'includes/footer.php'; ?>

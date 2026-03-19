@@ -10,12 +10,12 @@ if (!isset($_GET['id']) || $_GET['id'] == "") {
 $task_id = (int) $_GET['id'];
 $user_id = $_SESSION['user_id'];
 
-$title = "";
+$title       = "";
 $description = "";
-$priority = "Medium";
-$status = "Pending";
-$due_date = "";
-$message = "";
+$priority    = "Medium";
+$status      = "Pending";
+$due_date    = "";
+$message     = "";
 $messageType = "";
 
 /* Load current task */
@@ -33,19 +33,19 @@ if (mysqli_num_rows($result) != 1) {
 $task = mysqli_fetch_assoc($result);
 mysqli_stmt_close($stmt);
 
-$title = $task['title'];
+$title       = $task['title'];
 $description = $task['description'];
-$priority = $task['priority'];
-$status = $task['status'];
-$due_date = $task['due_date'];
+$priority    = $task['priority'];
+$status      = $task['status'];
+$due_date    = $task['due_date'];
 
 /* Update task */
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $title = trim($_POST['title']);
+    $title       = trim($_POST['title']);
     $description = trim($_POST['description']);
-    $priority = trim($_POST['priority']);
-    $status = trim($_POST['status']);
-    $due_date = trim($_POST['due_date']);
+    $priority    = trim($_POST['priority']);
+    $status      = trim($_POST['status']);
+    $due_date    = trim($_POST['due_date']);
 
     if ($title == "") {
         $message = "Task title is required.";
@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: dashboard.php");
             exit;
         } else {
-            $message = "Something went wrong while updating task.";
+            $message = "Something went wrong while updating the task.";
             $messageType = "error";
         }
 
@@ -71,86 +71,120 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 <?php include 'includes/header.php'; ?>
 
-<div class="min-h-screen py-10 bg-gray-100">
-    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-green-600">Edit Task</h1>
-                <p class="text-gray-500">Update your task details</p>
-            </div>
+<div class="min-h-screen py-10 px-4">
+    <div class="max-w-2xl mx-auto">
 
-            <a href="dashboard.php" class="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">
-                Back
-            </a>
-        </div>
+        <!-- Back link -->
+        <a href="dashboard.php" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors mb-6">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to Dashboard
+        </a>
 
-        <form method="POST" class="space-y-4">
-            <div>
-                <label class="block mb-1 font-medium">Task Title</label>
-                <input
-                    type="text"
-                    name="title"
-                    value="<?php echo htmlspecialchars($title); ?>"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2"
-                    placeholder="Enter task title"
-                >
-            </div>
+        <!-- Card -->
+        <div class="tf-card p-7 animate-scale-in">
 
-            <div>
-                <label class="block mb-1 font-medium">Description</label>
-                <textarea
-                    name="description"
-                    rows="4"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2"
-                    placeholder="Enter task description"
-                ><?php echo htmlspecialchars($description); ?></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-7">
+                <span class="stat-icon bg-emerald-50 w-11 h-11 rounded-xl">
+                    <svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                </span>
                 <div>
-                    <label class="block mb-1 font-medium">Priority</label>
-                    <select name="priority" class="w-full border border-gray-300 rounded-lg px-4 py-2">
-                        <option value="Low" <?php echo $priority == "Low" ? "selected" : ""; ?>>Low</option>
-                        <option value="Medium" <?php echo $priority == "Medium" ? "selected" : ""; ?>>Medium</option>
-                        <option value="High" <?php echo $priority == "High" ? "selected" : ""; ?>>High</option>
-                    </select>
+                    <h1 class="text-xl font-bold text-slate-800 tracking-tight">Edit Task</h1>
+                    <p class="text-slate-500 text-sm mt-0.5">Update the details of your task</p>
                 </div>
+            </div>
 
-                <div>
-                    <label class="block mb-1 font-medium">Status</label>
-                    <select name="status" class="w-full border border-gray-300 rounded-lg px-4 py-2">
-                        <option value="Pending" <?php echo $status == "Pending" ? "selected" : ""; ?>>Pending</option>
-                        <option value="Completed" <?php echo $status == "Completed" ? "selected" : ""; ?>>Completed</option>
-                    </select>
+            <hr class="tf-divider mt-0 mb-6">
+
+            <!-- Alert -->
+            <?php if ($message != ""): ?>
+                <div class="tf-alert <?php echo $messageType; ?> mb-5 animate-slide-down">
+                    <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <?php echo htmlspecialchars($message); ?>
                 </div>
+            <?php endif; ?>
 
+            <!-- Form -->
+            <form method="POST" class="space-y-5">
+
+                <!-- Title -->
                 <div>
-                    <label class="block mb-1 font-medium">Due Date</label>
+                    <label class="tf-label" for="title">Task title <span class="text-red-400">*</span></label>
                     <input
-                        type="date"
-                        name="due_date"
-                        value="<?php echo htmlspecialchars($due_date); ?>"
-                        class="w-full border border-gray-300 rounded-lg px-4 py-2"
+                        type="text"
+                        id="title"
+                        name="title"
+                        value="<?php echo htmlspecialchars($title); ?>"
+                        class="tf-input"
+                        placeholder="e.g. Design homepage wireframe"
                     >
                 </div>
-            </div>
 
-            <button
-                type="submit"
-                class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
-            >
-                Update Task
-            </button>
-        </form>
+                <!-- Description -->
+                <div>
+                    <label class="tf-label" for="description">Description <span class="text-slate-400 font-normal normal-case">(optional)</span></label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="4"
+                        class="tf-input resize-y"
+                        placeholder="Add any notes or details about this task…"
+                    ><?php echo htmlspecialchars($description); ?></textarea>
+                    <p class="text-xs text-slate-400 mt-1">Max 1000 characters</p>
+                </div>
 
-        <?php if ($message != ""): ?>
-            <div class="mt-6 p-4 rounded-lg <?php echo $messageType == 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'; ?>">
-                <?php echo $message; ?>
-            </div>
-        <?php endif; ?>
+                <!-- Priority / Status / Due Date -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="tf-label" for="priority">Priority</label>
+                        <select id="priority" name="priority" class="tf-input">
+                            <option value="Low"    <?php echo $priority == "Low"    ? "selected" : ""; ?>>🔵 Low</option>
+                            <option value="Medium" <?php echo $priority == "Medium" ? "selected" : ""; ?>>🟡 Medium</option>
+                            <option value="High"   <?php echo $priority == "High"   ? "selected" : ""; ?>>🔴 High</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="tf-label" for="status">Status</label>
+                        <select id="status" name="status" class="tf-input">
+                            <option value="Pending"   <?php echo $status == "Pending"   ? "selected" : ""; ?>>⏳ Pending</option>
+                            <option value="Completed" <?php echo $status == "Completed" ? "selected" : ""; ?>>✅ Completed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="tf-label" for="due_date">Due date</label>
+                        <input
+                            type="date"
+                            id="due_date"
+                            name="due_date"
+                            value="<?php echo htmlspecialchars($due_date ?? ''); ?>"
+                            class="tf-input"
+                        >
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3 pt-1">
+                    <button type="submit" class="btn btn-success flex-1 justify-content-center py-2.5">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Save Changes
+                    </button>
+                    <a href="dashboard.php" class="btn btn-secondary py-2.5">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
